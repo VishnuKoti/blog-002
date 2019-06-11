@@ -25,8 +25,7 @@ node('master') {
                 sh '${mvnHome}/bin/mvn clean package'
                 dockerCmd 'build --tag automatingguy/sparktodo:SNAPSHOT .'
             }
-        }
-    }
+      }
 
     stage('Deploy') {
         stage('Deploy') {
