@@ -83,7 +83,7 @@ node('master') {
 }
 
 def dockerCmd(args) {
-    sh "sudo ${DOCKER}/docker ${args}"
+    sh "${DOCKER}/docker ${args}"
 }
 
 def getReleasedVersion() {
