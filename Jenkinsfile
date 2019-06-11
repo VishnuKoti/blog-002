@@ -18,7 +18,7 @@ node('master') {
     }
 
     stage('Build') {
-        withMaven(maven: 'Maven 3') {
+        withMaven(maven: 'Maven 3.6.1') {
             dir('app') {
                 sh 'mvn clean package'
                 dockerCmd 'build --tag automatingguy/sparktodo:SNAPSHOT .'
