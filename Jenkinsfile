@@ -4,6 +4,10 @@ def releasedVersion
 
 node('master') {
   def dockerTool = tool name: 'docker', type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
+  tools {
+      maven 'mvn-3.6.1'
+    }
+	
   withEnv(["DOCKER=${dockerTool}/bin"]) {
     stage('Prepare') {
         deleteDir()
@@ -18,10 +22,8 @@ node('master') {
     }
 
     stage('Build') {
-      git url: 'https://github.com/jglick/simple-maven-project-with-tests.git'
-      def mvnHome = tool 'M3'
             dir('app') {
-                sh '${mvnHome}/bin/mvn clean package'
+                sh 'mvn clean package'
                 dockerCmd 'build --tag automatingguy/sparktodo:SNAPSHOT .'
             }
       }
