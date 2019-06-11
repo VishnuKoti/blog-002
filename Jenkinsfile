@@ -18,9 +18,11 @@ node('master') {
     }
 
     stage('Build') {
-        withMaven(maven: 'Maven 3.6.1') {
+      git url: 'https://github.com/jglick/simple-maven-project-with-tests.git'
+      def mvnHome = tool 'M3'
+ 	 sh "${mvnHome}/bin/mvn -B verify"
             dir('app') {
-                sh 'mvn clean package'
+                sh '${mvnHome}/bin/mvn clean package'
                 dockerCmd 'build --tag automatingguy/sparktodo:SNAPSHOT .'
             }
         }
