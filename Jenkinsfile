@@ -67,9 +67,7 @@ node('master') {
                 archiveArtifacts 'tests/bobcat/target/**'
             }
     
-            dockerCmd 'rm -f snapshot'
-            dockerCmd 'stop zalenium'
-            dockerCmd 'rm zalenium'
+          
     }
     
   }
