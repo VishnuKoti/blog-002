@@ -5,6 +5,14 @@ def releasedVersion
 node('master') {
   def dockerTool = tool name: 'docker', type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
   withEnv(["DOCKER=${dockerTool}/bin"]) {
+  
+    stage("Cleanup") {
+    	dockerCmd "stop zalenium"
+    	dockerCmd "rm zalenium"
+    	dockerCmd "stop snapshot"
+    	dockerCmd "rm snapshot"
+    }
+    
     stage('Prepare') {
         deleteDir()
         parallel Checkout: {
@@ -33,6 +41,36 @@ node('master') {
             }
         }
     }
+    
+     stage('Tests') {
+            try {
+                dir('tests/rest-assured') {
+                    sh './gradlew clean test'
+                }
+            } finally {
+                junit testResults: 'tests/rest-assured/build/*.xml', allowEmptyResults: true
+                archiveArtifacts 'tests/rest-assured/build/**'
+            }
+    
+            dockerCmd 'rm -f snapshot'
+            dockerCmd 'run -d -p 9999:9999 --name "snapshot" --network="host" automatingguy/sparktodo:SNAPSHOT'
+    
+            try {
+                withMaven(maven: 'Maven 3') {
+                    dir('tests/bobcat') {
+                        sh 'mvn clean test -Dmaven.test.failure.ignore=true'
+                    }
+                }
+            } finally {
+                junit testResults: 'tests/bobcat/target/*.xml', allowEmptyResults: true
+                archiveArtifacts 'tests/bobcat/target/**'
+            }
+    
+            dockerCmd 'rm -f snapshot'
+            dockerCmd 'stop zalenium'
+            dockerCmd 'rm zalenium'
+    }
+    
   }
 }
 
