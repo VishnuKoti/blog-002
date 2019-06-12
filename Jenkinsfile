@@ -20,7 +20,7 @@ node('master') {
     stage('Build') {
       git url: 'https://github.com/jglick/simple-maven-project-with-tests.git'
       def mvnHome = tool 'M3'
- 	 sh "${mvnHome}/bin/mvn -B verify"
+ 	 sh "${mvnHome}/bin/mvn -B verify -DskipTests=true"
             dir('app') {
                 sh '${mvnHome}/bin/mvn clean package'
                 dockerCmd 'build --tag automatingguy/sparktodo:SNAPSHOT .'
