@@ -24,12 +24,12 @@ node('master') {
  	 	sh "${mvnHome}/bin/mvn clean package"
                 dockerCmd 'build --tag automatingguy/sparktodo:SNAPSHOT .'
             }
-      }
+    }
 
     stage('Deploy') {
         stage('Deploy') {
             dir('app') {
-                dockerCmd 'run -d -p 9999:9999 --name "snapshot" --network="host" automatingguy/sparktodo:SNAPSHOT'
+                dockerCmd 'run -d -p 9999:9999 --name "snapshot" automatingguy/sparktodo:SNAPSHOT'
             }
         }
     }
