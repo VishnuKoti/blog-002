@@ -59,7 +59,7 @@ node('master') {
                
                     dir('tests/bobcat') {
                        def mvnHome = tool 'M3'
-	                sh ""${mvnHome}/bin/mvn clean test -Dmaven.test.failure.ignore=true"
+	                sh "${mvnHome}/bin/mvn clean test -Dmaven.test.failure.ignore=true"
                     }
                 
             } finally {
