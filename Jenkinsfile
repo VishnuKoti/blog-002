@@ -56,11 +56,12 @@ node('master') {
             dockerCmd 'run -d -p 9999:9999 --name "snapshot" --network="host" automatingguy/sparktodo:SNAPSHOT'
     
             try {
-                withMaven(maven: 'Maven 3') {
+               
                     dir('tests/bobcat') {
-                        sh 'mvn clean test -Dmaven.test.failure.ignore=true'
+                       def mvnHome = tool 'M3'
+	                sh ""${mvnHome}/bin/mvn clean test -Dmaven.test.failure.ignore=true"
                     }
-                }
+                
             } finally {
                 junit testResults: 'tests/bobcat/target/*.xml', allowEmptyResults: true
                 archiveArtifacts 'tests/bobcat/target/**'
