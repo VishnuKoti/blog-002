@@ -30,39 +30,13 @@ node('master') {
     stage('Deploy') {
         stage('Deploy') {
             dir('app') {
-                dockerCmd 'run -d -p 9999:9999 --name "snapshot" --network="host" automate/sparktodo:SNAPSHOT1.0'
+                dockerCmd 'run -d -p 9999:9999 --name "snapshot" automate/sparktodo:SNAPSHOT1.0'
             }
         }
     }
 
     
-     stage('Tests') {
-            try {
-                dir('tests/rest-assured') {
-                    sh './gradlew clean test'
-                }
-            } finally {
-                junit testResults: 'tests/rest-assured/build/*.xml', allowEmptyResults: true
-                archiveArtifacts 'tests/rest-assured/build/**'
-            }
-    
-            dockerCmd 'rm -f snapshot'
-            dockerCmd 'run -d -p 9999:9999 --name "snapshot" --network="host" automate/sparktodo:SNAPSHOT1.0'
-    
-            try {
-               
-                    dir('tests/bobcat') {
-                       def mvnHome = tool 'M3'
-	                sh "${mvnHome}/bin/mvn clean test -Dmaven.test.failure.ignore=true"
-                    }
-                
-            } finally {
-                junit testResults: 'tests/bobcat/target/*.xml', allowEmptyResults: true
-                archiveArtifacts 'tests/bobcat/target/**'
-            }
-    
-          
-    }
+   
     
   }
 }
