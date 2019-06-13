@@ -20,6 +20,7 @@ node('master') {
         }, 'Run Zalenium': {
             dockerCmd '''run -d --name zalenium -p 4444:4444 \
             -v /var/run/docker.sock:/var/run/docker.sock \
+            --network="host" \
             --privileged dosel/zalenium:3.4.0a start --videoRecordingEnabled false --chromeContainers 1 --firefoxContainers 0'''
         }
     }
@@ -36,39 +37,12 @@ node('master') {
     stage('Deploy') {
         stage('Deploy') {
             dir('app') {
-                dockerCmd 'run -d -p 9999:9999 --name "snapshot"  automatingguy/sparktodo:SNAPSHOT'
+                dockerCmd 'run -d -p 9999:9999 --name "snapshot" --network="host" automatingguy/sparktodo:SNAPSHOT'
             }
         }
     }
 
-    
-     stage('Tests') {
-            try {
-                dir('tests/rest-assured') {
-                    sh './gradlew clean test'
-                }
-            } finally {
-                junit testResults: 'tests/rest-assured/build/*.xml', allowEmptyResults: true
-                archiveArtifacts 'tests/rest-assured/build/**'
-            }
-    
-            dockerCmd 'rm -f snapshot'
-            dockerCmd 'run -d -p 9999:9999 --name "snapshot" automatingguy/sparktodo:SNAPSHOT'
-    
-            try {
-               
-                    dir('tests/bobcat') {
-                       def mvnHome = tool 'M3'
-	                sh "${mvnHome}/bin/mvn clean test -Dmaven.test.failure.ignore=true"
-                    }
-                
-            } finally {
-                junit testResults: 'tests/bobcat/target/*.xml', allowEmptyResults: true
-                archiveArtifacts 'tests/bobcat/target/**'
-            }
-    
-          
-    }
+   
     
   }
 }
