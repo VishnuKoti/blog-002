@@ -37,7 +37,7 @@ node('master') {
     stage('Deploy') {
         stage('Deploy') {
             dir('app') {
-                dockerCmd 'run -d -p 9999:9999 --name "snapshot" --network="host" automate/sparktodo:SNAPSHOT1.0'
+                dockerCmd 'run -d -p 9999:9999 --name "snapshot" --network="10.0.75.2" automate/sparktodo:SNAPSHOT1.0'
             }
         }
     }
