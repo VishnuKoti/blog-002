@@ -6,7 +6,13 @@ node('master') {
   def dockerTool = tool name: 'docker', type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
   withEnv(["DOCKER=${dockerTool}/bin"]) {
   
-   
+    stage("Cleanup") {
+         	dockerCmd "stop zalenium"
+         	dockerCmd "rm zalenium"
+         	dockerCmd "stop snapshot"
+         	dockerCmd "rm snapshot"
+    }
+    
     stage('Prepare') {
         deleteDir()
         parallel Checkout: {
@@ -31,7 +37,7 @@ node('master') {
     stage('Deploy') {
         stage('Deploy') {
             dir('app') {
-                dockerCmd 'run -d -p 9999:9999 --name "snapshot" --network="host" automate/sparktodo:SNAPSHOT1.0'
+                dockerCmd 'run -d -p 9999:9999 --name "snapshot" automate/sparktodo:SNAPSHOT1.0'
             }
         }
     }
