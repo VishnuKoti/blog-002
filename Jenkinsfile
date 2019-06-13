@@ -33,16 +33,7 @@ node('master') {
                 dockerCmd 'build --tag automatingguy/sparktodo:SNAPSHOT .'
             }
     }
-    
-    stage("BuildAnother"){
-     		git url: 'https://github.com/VishnuKoti/spring-boot-examples.git'
-                dir('spring-boot-tutorial-basics'){
-                def mvnHome = tool 'M3'
-    		 sh "${mvnHome}/bin/mvn clean package"
-                     dockerCmd 'build --tag springguy/springguy:SNAPSHOT .'
-            }
-    }
-
+ 
     stage('Deploy') {
         stage('Deploy') {
             dir('app') {
@@ -50,14 +41,7 @@ node('master') {
             }
         }
     }
-    
-      stage('DeployAgain') {
-            stage('DeployAgain') {
-                 dir('spring-boot-tutorial-basics'){
-                    dockerCmd 'run -d -p 9990:9990 --name "springshot" --network="host" springguy/springguy:SNAPSHOT'
-                }
-            }
-    }
+
     
      stage('Tests') {
             try {
