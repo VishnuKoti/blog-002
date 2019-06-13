@@ -43,17 +43,31 @@ node('master') {
     }
 
     stage('Tests') {
-          
            try {
-            withMaven(maven: 'Maven 3') {
+            dir('tests/rest-assured') {
+             sh './gradlew clean test'
+            }
+           } finally {
+            junit testResults: 'tests/rest-assured/build/*.xml', allowEmptyResults: true
+            archiveArtifacts 'tests/rest-assured/build/**'
+           }
+        
+           try {
+  
              dir('tests/bobcat') {
-              sh 'mvn clean test -Dmaven.test.failure.ignore=true'
-             }
+              def mvnHome = tool 'M3'
+ 	 	sh "${mvnHome}/bin/mvn clean package"
+              sh "${mvnHome}/bin/mvn clean test -Dmaven.test.failure.ignore=true"
+             
             }
            } finally {
             junit testResults: 'tests/bobcat/target/*.xml', allowEmptyResults: true
+            archiveArtifacts 'tests/bobcat/target/**'
            }
         
+           dockerCmd 'rm -f snapshot'
+           dockerCmd 'stop zalenium'
+           dockerCmd 'rm zalenium'
       }
    
     
