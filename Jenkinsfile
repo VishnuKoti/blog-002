@@ -52,7 +52,6 @@ node('master') {
             }
            } finally {
             junit testResults: 'tests/bobcat/target/*.xml', allowEmptyResults: true
-            archiveArtifacts 'tests/bobcat/target/*.*'
            }
         
       }
