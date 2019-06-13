@@ -6,7 +6,12 @@ node('master') {
   def dockerTool = tool name: 'docker', type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
   withEnv(["DOCKER=${dockerTool}/bin"]) {
   
-
+    stage("Cleanup") {
+         	dockerCmd "stop zalenium"
+         	dockerCmd "rm zalenium"
+         	dockerCmd "stop snapshot"
+         	dockerCmd "rm snapshot"
+    }
     
     stage('Prepare') {
         deleteDir()
@@ -59,7 +64,8 @@ node('master') {
             junit testResults: 'tests/bobcat/target/*.xml', allowEmptyResults: true
             archiveArtifacts 'tests/bobcat/target/**'
            }
-   
+        
+ 
       }
    
     
