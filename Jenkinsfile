@@ -15,9 +15,9 @@ node('master') {
     
     stage('Prepare') {
         deleteDir()
-        parallel Checkout: {
+        Checkout: {
             checkout scm
-        }, 'Run Zalenium': {
+        }, 'Run Junit': {
             dockerCmd '''run -d --name zalenium -p 4444:4444 \
             -v /var/run/docker.sock:/var/run/docker.sock \
             --network="host" \
@@ -52,6 +52,9 @@ node('master') {
             archiveArtifacts 'tests/rest-assured/build/**'
            }
         
+           dockerCmd 'rm -f snapshot'
+           dockerCmd 'run -d -p 9999:9999 --name "snapshot" automate/sparktodo:SNAPSHOT1.0'
+        
            try {
   
              dir('tests/bobcat') {
@@ -65,7 +68,7 @@ node('master') {
             archiveArtifacts 'tests/bobcat/target/**'
            }
         
- 
+      
       }
    
     
