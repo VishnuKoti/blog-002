@@ -6,7 +6,12 @@ node('master') {
   def dockerTool = tool name: 'docker', type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
   withEnv(["DOCKER=${dockerTool}/bin"]) {
   
-   
+    stage("Cleanup") {
+    	dockerCmd "stop zalenium"
+    	dockerCmd "rm zalenium"
+    	dockerCmd "stop snapshot"
+    	dockerCmd "rm snapshot"
+    }
     
     stage('Prepare') {
         deleteDir()
@@ -21,11 +26,20 @@ node('master') {
     }
 
     stage('Build') {
-              	git url: 'https://github.com/VishnuKoti/blog-002.git'
+             git url: 'https://github.com/VishnuKoti/blog-002.git'
               dir('app') {
 	        def mvnHome = tool 'M3'
  	 	sh "${mvnHome}/bin/mvn clean package"
                 dockerCmd 'build --tag automatingguy/sparktodo:SNAPSHOT .'
+            }
+    }
+    
+    stage("BuildAnother"){
+     		git url: 'https://github.com/VishnuKoti/spring-boot-examples.git'
+                dir('spring-boot-tutorial-basics'){
+                def mvnHome = tool 'M3'
+    		 sh "${mvnHome}/bin/mvn clean package"
+                     dockerCmd 'build --tag springguy/springguy:SNAPSHOT .'
             }
     }
 
@@ -35,6 +49,14 @@ node('master') {
                 dockerCmd 'run -d -p 9999:9999 --name "snapshot" --network="host" automatingguy/sparktodo:SNAPSHOT'
             }
         }
+    }
+    
+      stage('DeployAgain') {
+            stage('DeployAgain') {
+                 dir('spring-boot-tutorial-basics'){
+                    dockerCmd 'run -d -p 9990:9990 --name "springshot" --network="host" springguy/springguy:SNAPSHOT'
+                }
+            }
     }
     
      stage('Tests') {
