@@ -6,13 +6,6 @@ node('master') {
   def dockerTool = tool name: 'docker', type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
   withEnv(["DOCKER=${dockerTool}/bin"]) {
   
-    stage("Cleanup") {
-    	dockerCmd "stop zalenium"
-    	dockerCmd "rm zalenium"
-    	dockerCmd "stop snapshot"
-    	dockerCmd "rm snapshot"
-    }
-    
     stage('Prepare') {
         deleteDir()
         parallel Checkout: {
@@ -30,14 +23,14 @@ node('master') {
               dir('app') {
 	        def mvnHome = tool 'M3'
  	 	sh "${mvnHome}/bin/mvn clean package"
-                dockerCmd 'build --tag automatingguy/sparktodo:SNAPSHOT .'
+                dockerCmd 'build --tag automate/sparktodo:SNAPSHOT1.0 .'
             }
     }
  
     stage('Deploy') {
         stage('Deploy') {
             dir('app') {
-                dockerCmd 'run -d -p 9999:9999 --name "snapshot" --network="host" automatingguy/sparktodo:SNAPSHOT'
+                dockerCmd 'run -d -p 9999:9999 --name "snapshot" --network="host" automate/sparktodo:SNAPSHOT1.0'
             }
         }
     }
@@ -54,7 +47,7 @@ node('master') {
             }
     
             dockerCmd 'rm -f snapshot'
-            dockerCmd 'run -d -p 9999:9999 --name "snapshot" --network="host" automatingguy/sparktodo:SNAPSHOT'
+            dockerCmd 'run -d -p 9999:9999 --name "snapshot" --network="host" automate/sparktodo:SNAPSHOT1.0'
     
             try {
                
