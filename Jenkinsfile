@@ -18,7 +18,7 @@ node('master') {
              deleteDir()
              parallel Checkout: {
                  checkout scm
-             }, 'Run Zalenium': {
+             }, 'Run Junit': {
                  dockerCmd '''run -d --name zalenium -p 4444:4444 \
                  -v /var/run/docker.sock:/var/run/docker.sock \
                  --network="host" \
