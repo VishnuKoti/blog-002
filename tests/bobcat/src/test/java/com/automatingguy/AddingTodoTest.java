@@ -33,6 +33,7 @@ public class AddingTodoTest {
     List<String> expectedTodos =
         Collections.singletonList("Yet another very important task on the list");
 
+	if(null!=expectedTodos)
     landingPage.getTodoApp()
         .getNewTodoInput()
         .addTodo(expectedTodos.get(0));
