@@ -13,6 +13,8 @@ node('master') {
          	dockerCmd "rm snapshot"
     }
     
+
+    
     stage('Prepare') {
         deleteDir()
         Checkout: {
